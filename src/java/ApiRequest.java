@@ -1,10 +1,8 @@
 package src.java;
 
-import java.io.IOException;
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
+import java.net.URL;
+import java.util.Scanner;
+import java.io.InputStream;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JTextArea;
@@ -65,24 +63,20 @@ public class ApiRequest extends JFrame implements Runnable {
       @Override
       public void windowOpened(WindowEvent e) {
 
-        HttpClient client = HttpClient.newBuilder()
-            .version(HttpClient.Version.HTTP_2)
-            .build();
-
-        HttpRequest request = HttpRequest.newBuilder()
-            .uri(URI.create("https://jsonplaceholder.typicode.com/posts?_start=0&_limit=50"))
-            .GET()
-            .build();
-
         try {
-          HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-          textAreaApiResponse.setText(response.body());
-        } catch (IOException | InterruptedException ex) {
+
+          InputStream response = new URL("https://jsonplaceholder.typicode.com/posts?_start=0&_limit=50").openStream();
+          Scanner scanner = new Scanner(response);
+          String responseBody = scanner.useDelimiter("\\A").next();
+          textAreaApiResponse.setText(responseBody);
+          scanner.close();
+
+        } catch (Exception ex) {
           System.out.println("Error: " + ex);
         }
       }
-    });
 
+    });
   }
 
   @Override
